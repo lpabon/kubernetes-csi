@@ -113,10 +113,11 @@ func TestGRPCGetPluginInfoReponse(t *testing.T) {
 	// Make call
 	c := csi.NewIdentityClient(conn)
 	r, err := c.GetPluginInfo(context.Background(), in)
-	name := r.GetResult().GetName()
 	if err != nil {
 		t.Errorf("Error: %s", err.Error())
 	}
+
+	name := r.GetResult().GetName()
 	if name != "mock" {
 		t.Errorf("Unknown name: %s\n", name)
 	}
