@@ -56,7 +56,7 @@ func TestPluginInfoResponse(t *testing.T) {
 func TestGRPCGetPluginInfoReponse(t *testing.T) {
 
 	// Setup mock
-	m := gomock.NewController(t)
+	m := gomock.NewController(&mock_driver.SafeGoroutineTester{})
 	defer m.Finish()
 	driver := mock_driver.NewMockIdentityServer(m)
 
