@@ -22,7 +22,6 @@ import (
 	mock_driver "github.com/csi-volumes/kubernetes-csi/mock/driver"
 	gomock "github.com/golang/mock/gomock"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
 func TestPluginInfoResponse(t *testing.T) {
@@ -102,19 +101,14 @@ func TestGRPCGetPluginInfoReponse(t *testing.T) {
 	driver.EXPECT().GetPluginInfo(gomock.Any(), in).Return(out, nil).Times(1)
 
 	// Create a new RPC
-	server := mock_driver.NewMockCSIDriver()
-	err := server.Start(driver)
+	server := mock_driver.NewMockCSIDriver(&mock_driver.MockCSIDriverServers{
+		Identity: driver,
+	})
+	conn, err := server.Nexus()
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Errorf("Error: %s", err.Error())
 	}
-	defer server.Stop()
-
-	// Actual call
-	conn, err := grpc.Dial(server.Address(), grpc.WithInsecure())
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer conn.Close()
+	defer server.Close()
 
 	// Make call
 	c := csi.NewIdentityClient(conn)
